@@ -99,136 +99,30 @@
 
     </RelativeLayout>
 
-
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="15.0sp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/selectorAccountDestination">
+
+    <EditText
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:id="@+id/textAmount"
         android:layout_below="@+id/selectorAccountDestination"
+        android:ems="50"
+        android:inputType="numberDecimal"
+        android:layout_weight="1"
         />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/textAmount"
-        android:layout_centerHorizontal="@+id/textAmount"
-        >
+    <EditText
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/textAmountCurrency"
+        android:ems="50"
+        android:inputType="textAutoComplete"
+        android:text="@string/default_currency"
+        />
 
-        <Button
-            android:text="1"
-            android:tag="1"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:id="@+id/button1"
-            android:onClick="onKeypadClick"
-            />
-        <Button
-            android:text="2"
-            android:tag="2"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_toRightOf="@+id/button1"
-            android:id="@+id/button2"
-            android:onClick="onKeypadClick"
-            />
-        <Button
-            android:text="3"
-            android:tag="3"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_toRightOf="@+id/button2"
-            android:id="@+id/button3"
-            android:onClick="onKeypadClick"
-            />
-        <Button
-            android:text="4"
-            android:tag="4"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_below="@+id/button1"
-            android:id="@+id/button4"
-            android:onClick="onKeypadClick"
-            />
-        <Button
-            android:text="5"
-            android:tag="5"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_below="@+id/button2"
-            android:layout_toRightOf="@+id/button4"
-            android:id="@+id/button5"
-            android:onClick="onKeypadClick"
-            />
-        <Button
-            android:text="6"
-            android:tag="6"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_below="@+id/button3"
-            android:layout_toRightOf="@+id/button5"
-            android:id="@+id/button6"
-            android:onClick="onKeypadClick"
-            />
-        <Button
-            android:text="7"
-            android:tag="7"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_below="@+id/button4"
-            android:id="@+id/button7"
-            android:onClick="onKeypadClick"
-            />
-        <Button
-            android:text="8"
-            android:tag="8"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_below="@+id/button5"
-            android:layout_toRightOf="@+id/button7"
-            android:id="@+id/button8"
-            android:onClick="onKeypadClick"
-            />
-        <Button
-            android:text="9"
-            android:tag="9"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_below="@+id/button6"
-            android:layout_toRightOf="@+id/button8"
-            android:id="@+id/button9"
-            android:onClick="onKeypadClick"
-            />
-        <Button
-            android:text="."
-            android:tag="."
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_below="@+id/button7"
-            android:id="@+id/buttonDecimal"
-            android:onClick="onKeypadClick"
-            />
-
-        <Button
-            android:text="0"
-            android:tag="0"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_below="@+id/button8"
-            android:layout_toRightOf="@+id/button7"
-            android:id="@+id/button0"
-            android:onClick="onKeypadClick"
-            />
-
-        <Button
-            android:text="D"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_below="@+id/button9"
-            android:layout_toRightOf="@+id/button0"
-            android:id="@+id/buttonDel"
-            android:onClick="onKeypadDelClick"
-            />
-
-    </RelativeLayout>
+    </LinearLayout>
 
 </RelativeLayout>

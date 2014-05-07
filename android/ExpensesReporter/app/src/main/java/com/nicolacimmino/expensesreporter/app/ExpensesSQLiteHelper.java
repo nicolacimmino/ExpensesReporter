@@ -29,21 +29,31 @@ import android.util.Log;
 public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "Expenses";
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 4;
 
     // Transactions table.
     public static final String TABLE_TRANSACTIONS = "Transactions";
     public static final String TRANSACTIONS_ID = "id";
     public static final String TRANSACTIONS_Timestamp = "timstamp";
+    public static final String TRANSACTIONS_SyncDone = "syncdone";
     public static final String TRANSACTIONS_Source = "source";
     public static final String TRANSACTIONS_Destination = "destination";
     public static final String TRANSACTIONS_Amount = "amount";
+
+    public static final String[] ALL_TRANSACTIONS_COLS = {
+                TRANSACTIONS_ID,
+                TRANSACTIONS_Source,
+                TRANSACTIONS_Destination,
+                TRANSACTIONS_Amount,
+                TRANSACTIONS_Timestamp,
+                TRANSACTIONS_SyncDone };
 
     // Statement to create the database.
     private static final String DATABASE_CREATE = "create table "
             + TABLE_TRANSACTIONS + "("
             + TRANSACTIONS_ID + " integer primary key autoincrement, "
             + TRANSACTIONS_Timestamp + " timestamp default current_timestamp,"
+            + TRANSACTIONS_SyncDone + " text not null default '0',"
             + TRANSACTIONS_Source + " text not null,"
             + TRANSACTIONS_Destination + " text not null,"
             + TRANSACTIONS_Amount + " text not null);";

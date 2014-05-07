@@ -52,4 +52,17 @@ public class ExpensesTransactionData {
         database.insert(ExpensesSQLiteHelper.TABLE_TRANSACTIONS, null, values);
 
     }
+
+    /*
+     * Takes any transaction that has not yet been sent to the server and attempts
+     *  to send it.
+     */
+    public void SyncDataToServer()
+    {
+        Cursor cursor = database.query( ExpensesSQLiteHelper.TABLE_TRANSACTIONS,
+                       ExpensesSQLiteHelper.ALL_TRANSACTIONS_COLS,
+                       ExpensesSQLiteHelper.TRANSACTIONS_SyncDone + "=false",
+                       null, null, null, null, null);
+        
+    }
 }

@@ -47,8 +47,17 @@ public class ExpensesTransaction {
         return amount;
     }
 
+    public boolean isSyncDone() {
+        return syncDone;
+    }
+
+    public void setSyncDone(boolean syncDone) {
+        this.syncDone = syncDone;
+    }
+
     private String source;
     private String destination;
     private double amount;
+    private boolean syncDone;
 
 }
