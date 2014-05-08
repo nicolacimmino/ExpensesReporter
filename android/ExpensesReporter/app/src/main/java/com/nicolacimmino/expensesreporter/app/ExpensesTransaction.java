@@ -55,9 +55,20 @@ public class ExpensesTransaction {
         this.syncDone = syncDone;
     }
 
+    public void setId(long value) {
+        id = value;
+    }
+
+    public long getId() { return  id;}
+
     private String source;
     private String destination;
     private double amount;
     private boolean syncDone;
+    private long id;
 
+    @Override
+    public String toString() {
+        return String.valueOf(amount);
+    }
 }

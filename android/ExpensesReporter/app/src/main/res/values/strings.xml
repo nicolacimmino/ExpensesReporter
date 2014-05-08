@@ -7,5 +7,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="default_currency">eur</string>
+    <string name="title_activity_expenses_list">ExpensesListActivity</string>
+    <string name="action_show_expenses">Show Expenses</string>
 
 </resources>

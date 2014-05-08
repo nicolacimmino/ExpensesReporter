@@ -22,12 +22,14 @@ import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 
@@ -52,12 +54,12 @@ public class MainActivity extends Activity {
         transactionData = new ExpensesTransactionData(this);
         transactionData.open();
 
-        //mAccount = CreateSyncAccount(this);
+        mAccount = CreateSyncAccount(this);
 
         // Get the content resolver for your app
         mResolver = getContentResolver();
         // Turn on automatic syncing for the default account and authority
-        //mResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
+        mResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
 
     }
 
@@ -113,6 +115,12 @@ public class MainActivity extends Activity {
             return true;
         }
 
+        if(id == R.id.action_show_expenses)
+        {
+            Intent intent = new Intent(this, ExpensesListActivity.class);
+            startActivity(intent);
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -155,11 +163,17 @@ public class MainActivity extends Activity {
 
     public void onTransactionConfirmClick()
     {
-        TextView amountView = (TextView) findViewById(R.id.textAmount);
-        RadioGroup radioGroupSource = (RadioGroup) findViewById(R.id.radioGroupSource);
-        RadioGroup radioGroupDestination = (RadioGroup) findViewById(R.id.radioGroupDestination);
-        transactionData.addTransaction(getSelectedText(radioGroupSource), getSelectedText(radioGroupDestination), Double.parseDouble(amountView.getText().toString()));
-        amountView.setText("");
+        try {
+            TextView amountView = (TextView) findViewById(R.id.textAmount);
+            RadioGroup radioGroupSource = (RadioGroup) findViewById(R.id.radioGroupSource);
+            RadioGroup radioGroupDestination = (RadioGroup) findViewById(R.id.radioGroupDestination);
+            transactionData.addTransaction(getSelectedText(radioGroupSource), getSelectedText(radioGroupDestination), Double.parseDouble(amountView.getText().toString()));
+            amountView.setText("");
+        }
+        catch(Exception e)
+        {
+            Toast.makeText(getApplicationContext(), "Invalid input.", Toast.LENGTH_SHORT).show();
+        }
     }
 
 }

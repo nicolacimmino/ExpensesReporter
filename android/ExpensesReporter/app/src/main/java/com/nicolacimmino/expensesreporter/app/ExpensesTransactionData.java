@@ -23,6 +23,9 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by nicola on 03/05/14.
  */
@@ -51,6 +54,30 @@ public class ExpensesTransactionData {
         values.put(ExpensesSQLiteHelper.TRANSACTIONS_Amount, amount);
         database.insert(ExpensesSQLiteHelper.TABLE_TRANSACTIONS, null, values);
 
+    }
+
+    public List<ExpensesTransaction> getAllTransactions() {
+        List<ExpensesTransaction> expensesTransactions = new ArrayList<ExpensesTransaction>();
+
+        Cursor cursor = database.query(ExpensesSQLiteHelper.TABLE_TRANSACTIONS,
+                ExpensesSQLiteHelper.ALL_TRANSACTIONS_COLS, null, null, null, null, null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            ExpensesTransaction expensesTransaction = cursorToExpenseTransaction(cursor);
+            expensesTransactions.add(expensesTransaction);
+            cursor.moveToNext();
+        }
+        // make sure to close the cursor
+        cursor.close();
+        return expensesTransactions;
+    }
+
+    private ExpensesTransaction cursorToExpenseTransaction(Cursor cursor) {
+        ExpensesTransaction expensesTransaction = new ExpensesTransaction();
+        expensesTransaction.setId(cursor.getLong(0));
+        expensesTransaction.setAmount(cursor.getLong(3));
+        return expensesTransaction;
     }
 
     /*
