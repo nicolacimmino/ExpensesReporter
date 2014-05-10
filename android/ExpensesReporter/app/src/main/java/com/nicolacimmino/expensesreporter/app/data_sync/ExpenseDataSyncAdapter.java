@@ -16,7 +16,7 @@
  *    along with this program.  If not, see http://www.gnu.org/licenses/.
  *
 */
-package com.nicolacimmino.expensesreporter.app;
+package com.nicolacimmino.expensesreporter.app.data_sync;
 
 import android.accounts.Account;
 import android.content.AbstractThreadedSyncAdapter;

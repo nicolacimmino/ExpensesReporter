@@ -16,7 +16,7 @@
  *
 */
 
-package com.nicolacimmino.expensesreporter.app;
+package com.nicolacimmino.expensesreporter.app.data_model;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -24,7 +24,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 /**
- * Created by nicola on 03/05/14.
+ * Wrapper for SQL operations on the Expenses database.
  */
 public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
 
@@ -42,7 +42,7 @@ public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
     public static final String TRANSACTIONS_Description = "description";
     public static final String TRANSACTIONS_Currency = "currency";
 
-
+    // All columns from transactions table in an array.
     public static final String[] ALL_TRANSACTIONS_COLS = {
                 TRANSACTIONS_ID,
                 TRANSACTIONS_Source,
@@ -71,11 +71,15 @@ public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        // Create the database.
         sqLiteDatabase.execSQL(DATABASE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
+        // In this case we have a very simple policy to drop the database
+        //  and recreate it if the version is changed. This means user data is
+        //  lost. This is fine as the data is backed by the server.
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSACTIONS);
         onCreate(sqLiteDatabase);
     }

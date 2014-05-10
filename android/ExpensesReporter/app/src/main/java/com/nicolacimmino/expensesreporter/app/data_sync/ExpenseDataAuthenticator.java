@@ -1,4 +1,4 @@
-package com.nicolacimmino.expensesreporter.app;
+package com.nicolacimmino.expensesreporter.app.data_sync;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;

@@ -15,19 +15,19 @@
  *    along with this program.  If not, see http://www.gnu.org/licenses/.
  *
 */
-package com.nicolacimmino.expensesreporter.app;
+package com.nicolacimmino.expensesreporter.app.data_model;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by nicola on 03/05/14.
+ * Expenses data provider.
+ * This class is to be used to access expenses data.
  */
 public class ExpensesTransactionData {
 
@@ -39,14 +39,17 @@ public class ExpensesTransactionData {
         dbHelper = new ExpensesSQLiteHelper(context);
     }
 
-    public void open() throws SQLException {
+    private void open() throws SQLException {
         database = dbHelper.getWritableDatabase();
     }
 
-    public void close() {
+    private void close() {
         dbHelper.close();
     }
 
+    /*
+     * Adds one new transaction.
+     */
     public void addTransaction(String source, String destination,
                                     double amount, String description, String currency) {
         ContentValues values = new ContentValues();
@@ -55,37 +58,48 @@ public class ExpensesTransactionData {
         values.put(ExpensesSQLiteHelper.TRANSACTIONS_Amount, amount);
         values.put(ExpensesSQLiteHelper.TRANSACTIONS_Description, description);
         values.put(ExpensesSQLiteHelper.TRANSACTIONS_Currency, currency);
+        this.open();
         database.insert(ExpensesSQLiteHelper.TABLE_TRANSACTIONS, null, values);
+        this.close();
     }
 
+    /*
+     * Gets all transactions available.
+     */
     public List<ExpensesTransaction> getAllTransactions() {
         List<ExpensesTransaction> expensesTransactions = new ArrayList<ExpensesTransaction>();
 
+        // Select all rows all columns
+        this.open();
         Cursor cursor = database.query(ExpensesSQLiteHelper.TABLE_TRANSACTIONS,
                 ExpensesSQLiteHelper.ALL_TRANSACTIONS_COLS, null, null, null, null, null);
 
+        // Convert each row into an ExpenseTransaction
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             ExpensesTransaction expensesTransaction = cursorToExpenseTransaction(cursor);
             expensesTransactions.add(expensesTransaction);
             cursor.moveToNext();
         }
-        // make sure to close the cursor
+
         cursor.close();
+        this.close();
+
         return expensesTransactions;
     }
 
+    /*
+     * Helper to convert a Cursor into an ExpenseTransaction.
+     */
     private ExpensesTransaction cursorToExpenseTransaction(Cursor cursor) {
         ExpensesTransaction expensesTransaction = new ExpensesTransaction();
         expensesTransaction.setId(cursor.getLong(0));
         expensesTransaction.setSource(cursor.getString(1));
         expensesTransaction.setDestination(cursor.getString(2));
         expensesTransaction.setAmount(cursor.getDouble(3));
-        expensesTransaction.setSyncDone(cursor.getInt(5)==1);
+        expensesTransaction.setSyncDone(cursor.getInt(5) == 1);
         expensesTransaction.setDescription(cursor.getString(6));
         expensesTransaction.setCurrency(cursor.getString(7));
         return expensesTransaction;
     }
-
-
 }

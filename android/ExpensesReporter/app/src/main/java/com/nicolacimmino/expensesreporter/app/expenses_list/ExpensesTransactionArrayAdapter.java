@@ -1,4 +1,4 @@
-package com.nicolacimmino.expensesreporter.app;
+package com.nicolacimmino.expensesreporter.app.expenses_list;
 
 
 import android.app.Activity;
@@ -7,8 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.nicolacimmino.expensesreporter.app.data_model.ExpensesTransaction;
+import com.nicolacimmino.expensesreporter.app.R;
 
 import java.util.List;
 

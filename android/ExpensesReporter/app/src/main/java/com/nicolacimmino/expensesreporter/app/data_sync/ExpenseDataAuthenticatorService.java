@@ -1,8 +1,10 @@
-package com.nicolacimmino.expensesreporter.app;
+package com.nicolacimmino.expensesreporter.app.data_sync;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+
+import com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataAuthenticator;
 
 /**
  * Created by nicola on 07/05/2014.

@@ -12,12 +12,11 @@
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name="com.nicolacimmino.expensesreporter.app.ExpenseDataAuthenticatorService" >
+        <service android:name=".data_sync.ExpenseDataAuthenticatorService" >
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -28,13 +27,13 @@
         </service>
 
         <provider
-            android:name="com.nicolacimmino.expensesreporter.app.ExpensesDataContentProvider"
+            android:name=".data_sync.ExpensesDataContentProvider"
             android:authorities="com.nicolacimmino.android.datasync.provider"
             android:exported="false"
             android:syncable="true" />
 
         <service
-            android:name="com.nicolacimmino.expensesreporter.app.ExpenseDataSyncService"
+            android:name=".data_sync.ExpenseDataSyncService"
             android:exported="true"
             android:process=":sync" >
             <intent-filter>
@@ -47,7 +46,7 @@
         </service>
 
         <activity
-            android:name=".ExpensesListActivity"
+            android:name=".expenses_list.ExpensesListActivity"
             android:label="@string/title_activity_expenses_list"
             android:parentActivityName="com.nicolacimmino.expensesreporter.app.MainActivity" >
             <meta-data

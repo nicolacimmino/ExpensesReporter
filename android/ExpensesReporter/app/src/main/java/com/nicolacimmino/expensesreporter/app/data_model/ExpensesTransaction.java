@@ -15,12 +15,20 @@
  *    along with this program.  If not, see http://www.gnu.org/licenses/.
  *
 */
-package com.nicolacimmino.expensesreporter.app;
+package com.nicolacimmino.expensesreporter.app.data_model;
 
 /**
- * Created by nicola on 03/05/14.
+ * Models a single expense transaction.
  */
 public class ExpensesTransaction {
+
+    private String source;
+    private String destination;
+    private double amount;
+    private boolean syncDone;
+    private long id;
+    private String description;
+    private String currency;
 
     public void setSource(String source) {
         this.source = source;
@@ -34,10 +42,7 @@ public class ExpensesTransaction {
         this.amount = amount;
     }
 
-    public String getSource() {
-
-        return source;
-    }
+    public String getSource() { return source; }
 
     public String getDestination() {
         return destination;
@@ -68,14 +73,6 @@ public class ExpensesTransaction {
     public void setDescription(String description) {
         this.description = description;
     }
-
-    private String source;
-    private String destination;
-    private double amount;
-    private boolean syncDone;
-    private long id;
-    private String description;
-    private String currency;
 
     public String getCurrency() {
         return currency;

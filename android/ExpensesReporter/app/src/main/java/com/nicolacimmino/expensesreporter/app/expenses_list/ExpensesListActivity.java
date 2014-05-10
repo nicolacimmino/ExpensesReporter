@@ -1,23 +1,13 @@
-package com.nicolacimmino.expensesreporter.app;
+package com.nicolacimmino.expensesreporter.app.expenses_list;
 
 import android.app.ListActivity;
-import android.app.LoaderManager;
-import android.content.CursorLoader;
-import android.content.Loader;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.SimpleCursorAdapter;
 
-import org.w3c.dom.Comment;
+import com.nicolacimmino.expensesreporter.app.data_model.ExpensesTransaction;
+import com.nicolacimmino.expensesreporter.app.data_model.ExpensesTransactionData;
+import com.nicolacimmino.expensesreporter.app.R;
 
 import java.util.List;
 
@@ -30,7 +20,6 @@ public class ExpensesListActivity extends ListActivity  {
         super.onCreate(savedInstanceState);
 
         datasource = new ExpensesTransactionData(this);
-        datasource.open();
 
         List<ExpensesTransaction> values = datasource.getAllTransactions();
 

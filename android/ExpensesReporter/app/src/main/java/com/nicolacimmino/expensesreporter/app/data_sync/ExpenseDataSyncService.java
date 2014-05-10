@@ -17,7 +17,7 @@
  *
 */
 
-package com.nicolacimmino.expensesreporter.app;
+package com.nicolacimmino.expensesreporter.app.data_sync;
 
 import android.app.Service;
 import android.content.Intent;
