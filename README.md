@@ -1,3 +1,5 @@
+Expenses Reporter
+==========
 
 This is my first attempt at an Android application, so I am focusing more on learning and figuring out all the needed tools. the application itself doesn't have a general public interest as it is a simple expenses report integrated with my personal intranet.
 
