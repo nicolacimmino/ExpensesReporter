@@ -15,3 +15,10 @@ User can also get a list of expenses, this is a very simple list for now with no
 The application keeps data in sync with the server by means of a sync adapter. The sync service creates a new Android account type in order to authenticate the user with the server. The account can be found under Settings as other accounts are usually found in Android:
 
 ![Screenshot](https://raw.github.com/nicolacimmino/ExpensesReporter/master/documentation/screenshot3.png)
+
+Software Architecture
+===========
+
+Below is an oversimplified view of the architecture of the application. Data is stored locally on the phone in a SQLite database. This allows to use the application even when there is no internet connection. The Sync Service allows to leverage Android highly optimized Sync framework that allows to keep sync operations at a minimum and to have them scheduled oppurtunistically in order to reduce power consuption. On the server side is a ReSTful HTTP service that accepts the new data. There is no provision for sync of data from the server to the mobile since the main purpose of the application if to allow user to enter expenses in the system. Should the application be expanded to sync also in this direction GCM (Google Cloud Messaging) service would be a better choice from a power consumption standpoint.
+
+![Screenshot](https://raw.github.com/nicolacimmino/ExpensesReporter/master/documentation/structure.png)
