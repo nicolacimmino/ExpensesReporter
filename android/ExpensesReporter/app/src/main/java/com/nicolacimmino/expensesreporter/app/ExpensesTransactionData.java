@@ -47,13 +47,15 @@ public class ExpensesTransactionData {
         dbHelper.close();
     }
 
-    public void addTransaction(String source, String destination, double amount) {
+    public void addTransaction(String source, String destination,
+                                    double amount, String description, String currency) {
         ContentValues values = new ContentValues();
         values.put(ExpensesSQLiteHelper.TRANSACTIONS_Source, source);
         values.put(ExpensesSQLiteHelper.TRANSACTIONS_Destination, destination);
         values.put(ExpensesSQLiteHelper.TRANSACTIONS_Amount, amount);
+        values.put(ExpensesSQLiteHelper.TRANSACTIONS_Description, description);
+        values.put(ExpensesSQLiteHelper.TRANSACTIONS_Currency, currency);
         database.insert(ExpensesSQLiteHelper.TABLE_TRANSACTIONS, null, values);
-
     }
 
     public List<ExpensesTransaction> getAllTransactions() {
@@ -76,20 +78,14 @@ public class ExpensesTransactionData {
     private ExpensesTransaction cursorToExpenseTransaction(Cursor cursor) {
         ExpensesTransaction expensesTransaction = new ExpensesTransaction();
         expensesTransaction.setId(cursor.getLong(0));
-        expensesTransaction.setAmount(cursor.getLong(3));
+        expensesTransaction.setSource(cursor.getString(1));
+        expensesTransaction.setDestination(cursor.getString(2));
+        expensesTransaction.setAmount(cursor.getDouble(3));
+        expensesTransaction.setSyncDone(cursor.getInt(5)==1);
+        expensesTransaction.setDescription(cursor.getString(6));
+        expensesTransaction.setCurrency(cursor.getString(7));
         return expensesTransaction;
     }
 
-    /*
-     * Takes any transaction that has not yet been sent to the server and attempts
-     *  to send it.
-     */
-    public void SyncDataToServer()
-    {
-        Cursor cursor = database.query( ExpensesSQLiteHelper.TABLE_TRANSACTIONS,
-                       ExpensesSQLiteHelper.ALL_TRANSACTIONS_COLS,
-                       ExpensesSQLiteHelper.TRANSACTIONS_SyncDone + "=false",
-                       null, null, null, null, null);
-        
-    }
+
 }

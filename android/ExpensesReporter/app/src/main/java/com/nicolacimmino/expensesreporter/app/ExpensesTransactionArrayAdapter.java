@@ -36,26 +36,32 @@ public class ExpensesTransactionArrayAdapter extends ArrayAdapter<ExpensesTransa
             row = inflater.inflate(layoutResourceId, parent, false);
 
             holder = new ExpenseTransactionItemHolder();
-            ExpensesTransaction expensesTransaction = data.get(position);
-            holder.txtDestination.setText(expensesTransaction.getDestination());
-            holder.txtAmount.setText(String.valueOf(expensesTransaction.getAmount()));
+            holder.txtAmount = (TextView)row.findViewById(R.id.expense_row_amount);
+            holder.txtDescription = (TextView)row.findViewById(R.id.expense_row_description);
+            holder.txtAccounnts = (TextView)row.findViewById(R.id.expense_row_accounts);
+
             row.setTag(holder);
         }
         else
         {
             holder = (ExpenseTransactionItemHolder)row.getTag();
-            ExpensesTransaction expensesTransaction = data.get(position);
-            holder.txtDestination.setText(expensesTransaction.getDestination());
-            holder.txtAmount.setText(String.valueOf(expensesTransaction.getAmount()));
         }
 
+
+        holder = (ExpenseTransactionItemHolder)row.getTag();
+        ExpensesTransaction expensesTransaction = data.get(position);
+        holder.txtDescription.setText(expensesTransaction.getDescription());
+        holder.txtAmount.setText(String.valueOf(expensesTransaction.getAmount()));
+        holder.txtAccounnts.setText(expensesTransaction.getSource().toString() + " > "
+                                        + expensesTransaction.getDestination().toString());
         return row;
     }
 
     static class ExpenseTransactionItemHolder
     {
-        TextView txtDestination;
+        TextView txtDescription;
         TextView txtAmount;
+        TextView txtAccounnts;
 
     }
 }

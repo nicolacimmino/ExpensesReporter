@@ -27,7 +27,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -60,6 +62,19 @@ public class MainActivity extends Activity {
         mResolver = getContentResolver();
         // Turn on automatic syncing for the default account and authority
         mResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
+
+
+        Spinner spinner = (Spinner) findViewById(R.id.sourceSpinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+               R.array.transaction_sources, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner = (Spinner) findViewById(R.id.destinationSpinner);
+        adapter = ArrayAdapter.createFromResource(this,
+                R.array.transaction_destinations, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
 
     }
 
@@ -124,30 +139,6 @@ public class MainActivity extends Activity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void onToggleDestination(View v)
-    {
-        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioGroupDestination);
-        excludeOtherSelections(radioGroup, v);
-    }
-
-    public void onToggleSource(View v)
-    {
-        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioGroupSource);
-        excludeOtherSelections(radioGroup, v);
-    }
-
-    public void excludeOtherSelections(RadioGroup radioGroup, View v)
-    {
-        for(int x=0; x<radioGroup.getChildCount(); x++)
-        {
-            ToggleButton toggleButton = (ToggleButton)radioGroup.getChildAt(x);
-            if(toggleButton.getTag() != v.getTag())
-            {
-                toggleButton.setChecked(false);
-            }
-        }
-    }
-
     public String getSelectedText(RadioGroup radioGroup)
     {
         for(int x=0; x<radioGroup.getChildCount(); x++)
@@ -165,10 +156,18 @@ public class MainActivity extends Activity {
     {
         try {
             TextView amountView = (TextView) findViewById(R.id.textAmount);
-            RadioGroup radioGroupSource = (RadioGroup) findViewById(R.id.radioGroupSource);
-            RadioGroup radioGroupDestination = (RadioGroup) findViewById(R.id.radioGroupDestination);
-            transactionData.addTransaction(getSelectedText(radioGroupSource), getSelectedText(radioGroupDestination), Double.parseDouble(amountView.getText().toString()));
+            Spinner sourceSpinner = (Spinner) findViewById(R.id.sourceSpinner);
+            Spinner destinationSpinner = (Spinner) findViewById(R.id.destinationSpinner);
+            TextView notesView = (TextView) findViewById(R.id.textDescription);
+            TextView currencyView = (TextView) findViewById(R.id.textAmountCurrency);
+
+            transactionData.addTransaction(sourceSpinner.getSelectedItem().toString(),
+                                            destinationSpinner.getSelectedItem().toString(),
+                                            Double.parseDouble(amountView.getText().toString()),
+                                            notesView.getText().toString(),
+                                            currencyView.getText().toString());
             amountView.setText("");
+            Toast.makeText(getApplicationContext(), "Saved.", Toast.LENGTH_SHORT).show();
         }
         catch(Exception e)
         {

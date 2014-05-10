@@ -34,17 +34,10 @@ public class ExpensesListActivity extends ListActivity  {
 
         List<ExpensesTransaction> values = datasource.getAllTransactions();
 
-        // use the SimpleCursorAdapter to show the
-        // elements in a ListView
-        //ArrayAdapter<ExpensesTransaction> adapter = new ArrayAdapter<ExpensesTransaction>(this,
-        //        R.xml.expenses_list_item, values);
-
         ExpensesTransactionArrayAdapter adapter = new ExpensesTransactionArrayAdapter(this,
-                R.xml.expenses_list_item, values);
+                R.layout.expeses_transactions_row, values);
 
         setListAdapter(adapter);
-
-
     }
 
     @Override

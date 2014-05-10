@@ -29,7 +29,7 @@ import android.util.Log;
 public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "Expenses";
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
 
     // Transactions table.
     public static final String TABLE_TRANSACTIONS = "Transactions";
@@ -39,6 +39,9 @@ public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
     public static final String TRANSACTIONS_Source = "source";
     public static final String TRANSACTIONS_Destination = "destination";
     public static final String TRANSACTIONS_Amount = "amount";
+    public static final String TRANSACTIONS_Description = "description";
+    public static final String TRANSACTIONS_Currency = "currency";
+
 
     public static final String[] ALL_TRANSACTIONS_COLS = {
                 TRANSACTIONS_ID,
@@ -46,7 +49,9 @@ public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
                 TRANSACTIONS_Destination,
                 TRANSACTIONS_Amount,
                 TRANSACTIONS_Timestamp,
-                TRANSACTIONS_SyncDone };
+                TRANSACTIONS_SyncDone,
+                TRANSACTIONS_Description,
+                TRANSACTIONS_Currency};
 
     // Statement to create the database.
     private static final String DATABASE_CREATE = "create table "
@@ -56,6 +61,8 @@ public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
             + TRANSACTIONS_SyncDone + " text not null default '0',"
             + TRANSACTIONS_Source + " text not null,"
             + TRANSACTIONS_Destination + " text not null,"
+            + TRANSACTIONS_Description + " text not null,"
+            + TRANSACTIONS_Currency + " text not null,"
             + TRANSACTIONS_Amount + " text not null);";
 
     public ExpensesSQLiteHelper(Context context) {
