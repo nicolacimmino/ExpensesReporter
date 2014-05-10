@@ -3,5 +3,9 @@ This is my first attempt at an Android application, so I am focusing more on lea
 
 The application has a simple input interface that I have kept to a minimum as it will be ofter used while on the move, for instance just after purchasing something in a shop. 
 
+![Screenshot](https://raw.github.com/nicolacimmino/ExpensesReporter/master/documentation/screenshot.png)
+
 User can also get a list of expenses, this is a very simple list for now with no filtering nor sorting.
 
+
+![Screenshot](https://raw.github.com/nicolacimmino/ExpensesReporter/master/documentation/screenshot2.png)
