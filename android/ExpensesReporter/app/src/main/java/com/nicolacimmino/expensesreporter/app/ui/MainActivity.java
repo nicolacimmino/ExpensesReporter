@@ -21,6 +21,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -32,14 +33,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.nicolacimmino.expensesreporter.app.R;
-import com.nicolacimmino.expensesreporter.app.data_model.ExpensesTransactionData;
+import com.nicolacimmino.expensesreporter.app.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensesreporter.app.ui.ExpensesListActivity;
 
 
 public class MainActivity extends Activity {
 
-    // Data provider.
-    private ExpensesTransactionData transactionData;
     public static final String AUTHORITY = "com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataSyncAdapter";
     public static final String ACCOUNT_TYPE = "intra.nicolacimmino.com";
     public static final String ACCOUNT = "dummyaccount";
@@ -67,20 +66,17 @@ public class MainActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        // Get ready the data provider.
-        transactionData = new ExpensesTransactionData(this);
-
         mAccount = CreateSyncAccount(this);
         // Get the content resolver for your app
         mResolver = getContentResolver();
         // Turn on automatic syncing for the default account and authority
         //mResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
-        mResolver.addPeriodicSync(
+        /*mResolver.addPeriodicSync(
                 mAccount,
                 AUTHORITY,
                 new Bundle(),
                 1000);
-
+        */
     }
 
     public static Account CreateSyncAccount(Context context) {
@@ -159,12 +155,14 @@ public class MainActivity extends Activity {
             TextView notesView = (TextView) findViewById(R.id.textDescription);
             TextView currencyView = (TextView) findViewById(R.id.textAmountCurrency);
 
-            // Create the new transaction.
-            transactionData.addTransaction(sourceSpinner.getSelectedItem().toString(),
-                    destinationSpinner.getSelectedItem().toString(),
-                    Double.parseDouble(amountView.getText().toString()),
-                    notesView.getText().toString(),
-                    currencyView.getText().toString());
+            ContentValues values = new ContentValues();
+            values.put(ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT, amountView.getText().toString());
+            values.put(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE, sourceSpinner.getSelectedItem().toString());
+            values.put(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION, destinationSpinner.getSelectedItem().toString());
+            values.put(ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION, notesView.getText().toString());
+            values.put(ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY, currencyView.getText().toString());
+
+            getContentResolver().insert(ExpenseDataContract.Expense.CONTENT_URI, values);
 
             // Clear the input fields so the interface is ready for another operation.
             amountView.setText("");

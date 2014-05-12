@@ -29,41 +29,19 @@ import android.util.Log;
 public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "Expenses";
-    public static final int DATABASE_VERSION = 5;
-
-    // Transactions table.
-    public static final String TABLE_TRANSACTIONS = "Transactions";
-    public static final String TRANSACTIONS_ID = "id";
-    public static final String TRANSACTIONS_Timestamp = "timstamp";
-    public static final String TRANSACTIONS_SyncDone = "syncdone";
-    public static final String TRANSACTIONS_Source = "source";
-    public static final String TRANSACTIONS_Destination = "destination";
-    public static final String TRANSACTIONS_Amount = "amount";
-    public static final String TRANSACTIONS_Description = "description";
-    public static final String TRANSACTIONS_Currency = "currency";
-
-    // All columns from transactions table in an array.
-    public static final String[] ALL_TRANSACTIONS_COLS = {
-                TRANSACTIONS_ID,
-                TRANSACTIONS_Source,
-                TRANSACTIONS_Destination,
-                TRANSACTIONS_Amount,
-                TRANSACTIONS_Timestamp,
-                TRANSACTIONS_SyncDone,
-                TRANSACTIONS_Description,
-                TRANSACTIONS_Currency};
+    public static final int DATABASE_VERSION = 7;
 
     // Statement to create the database.
     private static final String DATABASE_CREATE = "create table "
-            + TABLE_TRANSACTIONS + "("
-            + TRANSACTIONS_ID + " integer primary key autoincrement, "
-            + TRANSACTIONS_Timestamp + " timestamp default current_timestamp,"
-            + TRANSACTIONS_SyncDone + " text not null default '0',"
-            + TRANSACTIONS_Source + " text not null,"
-            + TRANSACTIONS_Destination + " text not null,"
-            + TRANSACTIONS_Description + " text not null,"
-            + TRANSACTIONS_Currency + " text not null,"
-            + TRANSACTIONS_Amount + " text not null);";
+            + ExpenseDataContract.Expense.TABLE_NAME + "("
+            + ExpenseDataContract.Expense.COLUMN_NAME_ID + " integer primary key autoincrement, "
+            + ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP + " timestamp default current_timestamp,"
+            + ExpenseDataContract.Expense.COLUMN_NAME_SYNC + " text not null default '0',"
+            + ExpenseDataContract.Expense.COLUMN_NAME_SOURCE + " text not null,"
+            + ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION + " text not null,"
+            + ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION + " text not null,"
+            + ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY + " text not null,"
+            + ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT + " text not null);";
 
     public ExpensesSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -80,7 +58,7 @@ public class ExpensesSQLiteHelper extends SQLiteOpenHelper {
         // In this case we have a very simple policy to drop the database
         //  and recreate it if the version is changed. This means user data is
         //  lost. This is fine as the data is backed by the server.
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_TRANSACTIONS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + ExpenseDataContract.Expense.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }

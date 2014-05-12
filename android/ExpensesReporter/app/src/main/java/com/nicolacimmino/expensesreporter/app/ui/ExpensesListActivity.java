@@ -1,30 +1,25 @@
 package com.nicolacimmino.expensesreporter.app.ui;
 
 import android.app.ListActivity;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 
-import com.nicolacimmino.expensesreporter.app.data_model.ExpensesTransaction;
-import com.nicolacimmino.expensesreporter.app.data_model.ExpensesTransactionData;
+import com.nicolacimmino.expensesreporter.app.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensesreporter.app.R;
-
-import java.util.List;
 
 public class ExpensesListActivity extends ListActivity  {
 
-    private ExpensesTransactionData datasource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        datasource = new ExpensesTransactionData(this);
+        Cursor cursor = getContentResolver().query(ExpenseDataContract.Expense.CONTENT_URI,
+                ExpenseDataContract.Expense.COLUMN_NAME_ALL, null, null, null);
 
-        List<ExpensesTransaction> values = datasource.getAllTransactions();
-
-        ExpensesTransactionArrayAdapter adapter = new ExpensesTransactionArrayAdapter(this,
-                R.layout.expeses_transactions_row, values);
+        ExpensesTransactionCursorAdapter adapter = new ExpensesTransactionCursorAdapter(this, R.layout.expeses_transactions_row, cursor, 0);
 
         setListAdapter(adapter);
     }

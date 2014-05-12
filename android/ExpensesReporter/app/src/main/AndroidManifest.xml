@@ -28,9 +28,9 @@
 
         <provider
             android:name=".data_model.ExpensesDataContentProvider"
-            android:authorities="com.nicolacimmino.expensesdata.provider"
+            android:authorities="com.nicolacimmino.expensesreporter.provider"
             android:exported="false"
-            android:syncable="true" />
+            android:syncable="true"/>
 
         <service
             android:name=".data_sync.ExpenseDataSyncService"
