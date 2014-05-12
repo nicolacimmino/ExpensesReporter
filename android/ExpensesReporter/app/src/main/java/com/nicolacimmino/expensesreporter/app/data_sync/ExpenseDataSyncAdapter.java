@@ -24,16 +24,27 @@ import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
-
+import android.util.Log;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 
+/*
+ * Sync adapter for Expense data.
+ * This is used by Android sync manager to execute data syncs.
+ * Since we extend  AbstractThreadedSyncAdapter our operations will be run in a thread different
+ * than UI thread, so it's safe to have long blocking operations here.
+ */
 public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
+
+    // Tag used for logging so we can filter messages from this class.
+    public static final String TAG = "ExpenseDataSyncAdapter";
 
     public ExpenseDataSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -55,7 +66,8 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
 
         HttpURLConnection urlConnection = null;
         try {
-            URL url = new URL("http://www.nicolacimmino.com/synctest");
+            Log.i(TAG, "Starting sync");
+            URL url = new URL("http://www.nicolacimmino.com");
             urlConnection = (HttpURLConnection) url.openConnection();
             InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
             BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
@@ -64,16 +76,21 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
             while ((line = r.readLine()) != null) {
                 response.append(line);
             }
-        }
-        catch (Exception e) {
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "URL is malformed", e);
+            syncResult.stats.numParseExceptions++;
+            return;
+        } catch (IOException e) {
+            Log.e(TAG, "Error reading from network: " + e.toString());
+            syncResult.stats.numIoExceptions++;
+            return;
         }
         finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
         }
+
+        Log.i(TAG, "Sync done");
     }
-
-
-
 }

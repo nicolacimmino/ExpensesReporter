@@ -22,13 +22,18 @@ package com.nicolacimmino.expensesreporter.app.data_sync;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.util.Log;
 
 /**
- * Created by nicola on 06/05/2014.
+ * This is the sync service that is responsible to provide binding to the sync adapter.
  */
 public class ExpenseDataSyncService extends Service {
+
     private static ExpenseDataSyncAdapter syncAdapter = null;
     private static final Object syncAdapterLock = new Object();
+
+    // Tag used for logging so we can filter messages from this class.
+    public static final String TAG = "ExpenseDataSyncService";
 
     @Override
     public void onCreate() {
@@ -38,10 +43,18 @@ public class ExpenseDataSyncService extends Service {
                 syncAdapter = new ExpenseDataSyncAdapter(getApplicationContext(), true);
             }
         }
+        Log.i(TAG, "Service created");
     }
 
     @Override
     public IBinder onBind(Intent intent) {
+        Log.i(TAG, "Service bound to sync adapter");
         return syncAdapter.getSyncAdapterBinder();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(TAG, "Service destroyed");
+        super.onDestroy();
     }
 }

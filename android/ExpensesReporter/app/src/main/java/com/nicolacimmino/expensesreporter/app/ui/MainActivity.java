@@ -15,7 +15,7 @@
  *    along with this program.  If not, see http://www.gnu.org/licenses/.
  *
 */
-package com.nicolacimmino.expensesreporter.app;
+package com.nicolacimmino.expensesreporter.app.ui;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -27,23 +27,21 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
+import com.nicolacimmino.expensesreporter.app.R;
 import com.nicolacimmino.expensesreporter.app.data_model.ExpensesTransactionData;
-import com.nicolacimmino.expensesreporter.app.expenses_list.ExpensesListActivity;
+import com.nicolacimmino.expensesreporter.app.ui.ExpensesListActivity;
 
 
 public class MainActivity extends Activity {
 
     // Data provider.
     private ExpensesTransactionData transactionData;
-
     public static final String AUTHORITY = "com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataSyncAdapter";
-    public static final String ACCOUNT_TYPE = "nicolacimmino.com";
+    public static final String ACCOUNT_TYPE = "intra.nicolacimmino.com";
     public static final String ACCOUNT = "dummyaccount";
     Account mAccount;
     ContentResolver mResolver;
@@ -72,22 +70,23 @@ public class MainActivity extends Activity {
         // Get ready the data provider.
         transactionData = new ExpensesTransactionData(this);
 
-        //mAccount = CreateSyncAccount(this);
+        mAccount = CreateSyncAccount(this);
         // Get the content resolver for your app
-        //mResolver = getContentResolver();
+        mResolver = getContentResolver();
         // Turn on automatic syncing for the default account and authority
         //mResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
+        mResolver.addPeriodicSync(
+                mAccount,
+                AUTHORITY,
+                new Bundle(),
+                1000);
 
     }
 
     public static Account CreateSyncAccount(Context context) {
-        // Create the account type and default account
-        Account newAccount = new Account(
-                ACCOUNT, ACCOUNT_TYPE);
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(
-                        ACCOUNT_SERVICE);
+
+        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
         /*
          * Add the account and account type, no password or user data
          * If successful, return the Account object, otherwise report an error.
@@ -162,10 +161,10 @@ public class MainActivity extends Activity {
 
             // Create the new transaction.
             transactionData.addTransaction(sourceSpinner.getSelectedItem().toString(),
-                                            destinationSpinner.getSelectedItem().toString(),
-                                            Double.parseDouble(amountView.getText().toString()),
-                                            notesView.getText().toString(),
-                                            currencyView.getText().toString());
+                    destinationSpinner.getSelectedItem().toString(),
+                    Double.parseDouble(amountView.getText().toString()),
+                    notesView.getText().toString(),
+                    currencyView.getText().toString());
 
             // Clear the input fields so the interface is ready for another operation.
             amountView.setText("");

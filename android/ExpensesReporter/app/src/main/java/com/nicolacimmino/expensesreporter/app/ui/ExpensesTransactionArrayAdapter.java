@@ -1,4 +1,4 @@
-package com.nicolacimmino.expensesreporter.app.expenses_list;
+package com.nicolacimmino.expensesreporter.app.ui;
 
 
 import android.app.Activity;

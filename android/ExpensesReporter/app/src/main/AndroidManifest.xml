@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.nicolacimmino.expensesreporter.app.MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,8 +27,8 @@
         </service>
 
         <provider
-            android:name=".data_sync.ExpensesDataContentProvider"
-            android:authorities="com.nicolacimmino.android.datasync.provider"
+            android:name=".data_model.ExpensesDataContentProvider"
+            android:authorities="com.nicolacimmino.expensesdata.provider"
             android:exported="false"
             android:syncable="true" />
 
@@ -46,9 +46,9 @@
         </service>
 
         <activity
-            android:name=".expenses_list.ExpensesListActivity"
+            android:name=".ui.ExpensesListActivity"
             android:label="@string/title_activity_expenses_list"
-            android:parentActivityName="com.nicolacimmino.expensesreporter.app.MainActivity" >
+            android:parentActivityName=".ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />
