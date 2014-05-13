@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 
     public static final String AUTHORITY = "com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataSyncAdapter";
     public static final String ACCOUNT_TYPE = "intra.nicolacimmino.com";
-    public static final String ACCOUNT = "dummyaccount";
+    public static final String ACCOUNT = "expensesreporter";
     Account mAccount;
     ContentResolver mResolver;
 

@@ -21,18 +21,23 @@ package com.nicolacimmino.expensesreporter.app.data_sync;
 import android.accounts.Account;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
+
+import com.nicolacimmino.expensesreporter.app.data_model.ExpenseDataContract;
+
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 
 /*
@@ -64,33 +69,84 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
             ContentProviderClient provider,
             SyncResult syncResult) {
 
-        HttpURLConnection urlConnection = null;
-        try {
-            Log.i(TAG, "Starting sync");
-            URL url = new URL("http://www.nicolacimmino.com");
-            urlConnection = (HttpURLConnection) url.openConnection();
-            InputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
-            BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = r.readLine()) != null) {
-                response.append(line);
-            }
-        } catch (MalformedURLException e) {
-            Log.e(TAG, "URL is malformed", e);
-            syncResult.stats.numParseExceptions++;
-            return;
-        } catch (IOException e) {
-            Log.e(TAG, "Error reading from network: " + e.toString());
-            syncResult.stats.numIoExceptions++;
-            return;
-        }
-        finally {
-            if (urlConnection != null) {
-                urlConnection.disconnect();
-            }
-        }
+        // Get expenses that are not yet synced with the server.
+        Cursor expenses = getContext().getContentResolver().query(ExpenseDataContract.Expense.CONTENT_URI,
+                                                ExpenseDataContract.Expense.COLUMN_NAME_ALL,
+                                                ExpenseDataContract.Expense.COLUMN_NAME_SYNC + "=?",
+                                                new String[]{"0"},
+                                                null);
+        Log.i(TAG, "Starting sync");
 
+        while(expenses.moveToNext()) {
+            HttpURLConnection connection = null;
+            try {
+                Log.i(TAG, "Posting one item");
+
+                Map<String,Object> params = new LinkedHashMap<String,Object>();
+                params.put("_id", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_ID)));
+                params.put("description", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESCRIPTION)));
+                params.put("currency", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_CURRENCY)));
+                params.put("amount", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT)));
+                params.put("destination", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION)));
+                params.put("source", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE)));
+                params.put("timestamp", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP)));
+
+                // URLencode and place all params in a string like name=value&name=value...
+                StringBuilder postData = new StringBuilder();
+                for (Map.Entry<String,Object> param : params.entrySet()) {
+                    if (postData.length() != 0) postData.append('&');
+                    postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+                    postData.append('=');
+                    postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+                }
+                byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
+                URL url = new URL("http://www.nicolacimmino.com");
+                connection = (HttpURLConnection) url.openConnection();
+                connection.setDoOutput(true);
+                connection.setDoInput(true);
+                connection.setInstanceFollowRedirects(false);
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                connection.setRequestProperty("charset", "utf-8");
+                connection.setRequestProperty("Content-Length", "" + Integer.toString(postDataBytes.length));
+                connection.setUseCaches(false);
+
+                DataOutputStream wr = new DataOutputStream(connection.getOutputStream ());
+                wr.write(postDataBytes);
+                wr.flush();
+                wr.close();
+
+                int response = connection.getResponseCode();
+                connection.disconnect();
+
+                if(response == 200) {
+                    syncResult.stats.numEntries++;
+                    ContentValues values = new ContentValues();
+                    values.put(ExpenseDataContract.Expense.COLUMN_NAME_SYNC, "1");
+                    getContext().getContentResolver().update(ExpenseDataContract.Expense.CONTENT_URI,
+                            values,
+                            ExpenseDataContract.Expense.COLUMN_NAME_ID + "=?",
+                            new String[]{expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_ID))});
+                }
+                else {
+                    syncResult.stats.numIoExceptions++;
+                }
+            } catch (MalformedURLException e) {
+                Log.e(TAG, "URL is malformed", e);
+                syncResult.stats.numParseExceptions++;
+                return;
+            } catch (IOException e) {
+                Log.e(TAG, "Error reading from network: " + e.toString());
+                syncResult.stats.numIoExceptions++;
+                return;
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+            }
+        }
+        expenses.close();
         Log.i(TAG, "Sync done");
     }
 }
