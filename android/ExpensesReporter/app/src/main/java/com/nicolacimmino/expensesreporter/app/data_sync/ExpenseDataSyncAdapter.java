@@ -101,7 +101,7 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
                 byte[] postDataBytes = postData.toString().getBytes("UTF-8");
 
-                URL url = new URL("http://www.nicolacimmino.com");
+                URL url = new URL("https://intra.nicolacimmino.com/report_expense.php");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setDoOutput(true);
                 connection.setDoInput(true);
@@ -118,6 +118,7 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
                 wr.close();
 
                 int response = connection.getResponseCode();
+                Log.i(TAG, String.valueOf(response));
                 connection.disconnect();
 
                 if(response == 200) {
