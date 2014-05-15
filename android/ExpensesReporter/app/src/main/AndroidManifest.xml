@@ -8,15 +8,16 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ui.MainActivity"
+            android:name="com.nicolacimmino.expensesreporter.app.ui.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <service android:name=".data_sync.ExpenseDataAuthenticatorService" >
+        <service android:name="com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataAuthenticatorService" >
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -27,13 +28,13 @@
         </service>
 
         <provider
-            android:name=".data_model.ExpensesDataContentProvider"
+            android:name="com.nicolacimmino.expensesreporter.app.data_model.ExpensesDataContentProvider"
             android:authorities="com.nicolacimmino.expensesreporter.provider"
             android:exported="false"
-            android:syncable="true"/>
+            android:syncable="true" />
 
         <service
-            android:name=".data_sync.ExpenseDataSyncService"
+            android:name="com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataSyncService"
             android:exported="true"
             android:process=":sync" >
             <intent-filter>
@@ -46,14 +47,22 @@
         </service>
 
         <activity
-            android:name=".ui.ExpensesListActivity"
+            android:name="com.nicolacimmino.expensesreporter.app.ui.ExpensesListActivity"
             android:label="@string/title_activity_expenses_list"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName="com.nicolacimmino.expensesreporter.app.ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="MainActivity" />
         </activity>
+        <activity
+            android:name="com.nicolacimmino.expensesreporter.app.ui.ExpenseDataLoginActivity"
+            android:label="@string/title_activity_expese_data_login"
+            android:windowSoftInputMode="adjustResize|stateHidden" >
+        </activity>
 
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -61,5 +70,17 @@
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!--
+     To retrieve OAuth 2.0 tokens or invalidate tokens to disconnect a user. This disconnect
+     option is required to comply with the Google+ Sign-In developer policies
+    -->
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+
+    <!-- To retrieve the account name (email) as part of sign-in: -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.READ_PROFILE" />
 
 </manifest>

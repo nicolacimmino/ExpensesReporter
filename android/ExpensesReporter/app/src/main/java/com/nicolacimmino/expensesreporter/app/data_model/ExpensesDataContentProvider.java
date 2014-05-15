@@ -121,7 +121,7 @@ public class ExpensesDataContentProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown URI: " + uri);
         }
 
-        getContext().getContentResolver().notifyChange(uri, null, false);
+        getContext().getContentResolver().notifyChange(uri, null, true);
         return result;
     }
 

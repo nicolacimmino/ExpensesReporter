@@ -34,14 +34,11 @@ import android.widget.Toast;
 
 import com.nicolacimmino.expensesreporter.app.R;
 import com.nicolacimmino.expensesreporter.app.data_model.ExpenseDataContract;
-import com.nicolacimmino.expensesreporter.app.ui.ExpensesListActivity;
-
+import com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataAuthenticatorContract;
 
 public class MainActivity extends Activity {
 
-    public static final String AUTHORITY = "com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataSyncAdapter";
-    public static final String ACCOUNT_TYPE = "intra.nicolacimmino.com";
-    public static final String ACCOUNT = "expensesreporter";
+
     Account mAccount;
     ContentResolver mResolver;
 
@@ -69,19 +66,16 @@ public class MainActivity extends Activity {
         mAccount = CreateSyncAccount(this);
         // Get the content resolver for your app
         mResolver = getContentResolver();
+
         // Turn on automatic syncing for the default account and authority
-        //mResolver.setSyncAutomatically(mAccount, AUTHORITY, true);
-        /*mResolver.addPeriodicSync(
-                mAccount,
-                AUTHORITY,
-                new Bundle(),
-                1000);
-        */
+        ContentResolver.setIsSyncable(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, 1);
+        mResolver.setSyncAutomatically(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, true);
     }
 
     public static Account CreateSyncAccount(Context context) {
 
-        Account newAccount = new Account(ACCOUNT, ACCOUNT_TYPE);
+        Account newAccount = new Account(ExpenseDataAuthenticatorContract.ACCOUNT,
+                                            ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
         AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
         /*
          * Add the account and account type, no password or user data
@@ -170,6 +164,8 @@ public class MainActivity extends Activity {
 
             // We show a toaster as visual feedback that something has happened.
             Toast.makeText(getApplicationContext(), "Saved.", Toast.LENGTH_SHORT).show();
+
+            getContentResolver().requestSync(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, null);
         }
         catch(Exception e)
         {

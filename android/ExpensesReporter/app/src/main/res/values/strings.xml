@@ -15,14 +15,26 @@
     <string name="amount">Amount</string>
 
     <string-array name="transaction_sources">
+        <item>Bank</item>
         <item>Visa</item>
         <item>Cash</item>
-        <item>Bank</item>
+        <item>Loan</item>
+        <item>Savings</item>
+        <item>Skrill</item>
     </string-array>
 
     <string-array name="transaction_destinations">
-        <item>Home</item>
         <item>Food</item>
+        <item>Home</item>
         <item>Transport</item>
+        <item>Car</item>
+        <item>Phone</item>
+        <item>Clothing</item>
+        <item>Bank</item>
+        <item>Visa</item>
+        <item>Cash</item>
+        <item>Loan</item>
+        <item>Savings</item>
+        <item>Skrill</item>
     </string-array>
 </resources>
