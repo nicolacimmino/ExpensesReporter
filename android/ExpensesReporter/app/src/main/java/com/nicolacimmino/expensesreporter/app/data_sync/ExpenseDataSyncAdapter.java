@@ -19,6 +19,7 @@
 package com.nicolacimmino.expensesreporter.app.data_sync;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentValues;
@@ -51,6 +52,8 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
     // Tag used for logging so we can filter messages from this class.
     public static final String TAG = "ExpenseDataSyncAdapter";
 
+    private AccountManager mAccountManager;
+
     public ExpenseDataSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
     }
@@ -60,6 +63,8 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
             boolean autoInitialize,
             boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
+
+        mAccountManager = AccountManager.get(context);
     }
 
     public void onPerformSync(
@@ -68,6 +73,15 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
             String authority,
             ContentProviderClient provider,
             SyncResult syncResult) {
+
+        String authToken="";
+        try {
+            authToken = mAccountManager.blockingGetAuthToken(account, ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
+        }
+        catch(Exception e) {
+            syncResult.stats.numAuthExceptions++;
+            return;
+        }
 
         // Get expenses that are not yet synced with the server.
         Cursor expenses = getContext().getContentResolver().query(ExpenseDataContract.Expense.CONTENT_URI,
@@ -147,6 +161,7 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
         }
+
         expenses.close();
         Log.i(TAG, "Sync done");
     }

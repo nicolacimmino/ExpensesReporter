@@ -176,7 +176,7 @@ public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity imple
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 2;
     }
 
     /**

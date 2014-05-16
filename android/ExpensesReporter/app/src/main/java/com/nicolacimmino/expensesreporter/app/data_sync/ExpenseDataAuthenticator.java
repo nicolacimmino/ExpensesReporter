@@ -1,3 +1,20 @@
+/* ExpenseDataAuthenticator is part of ExpensesReporter and is the account authenticator.
+ *   Copyright (C) 2014 Nicola Cimmino
+ *
+ *    This program is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation, either version 3 of the License, or
+ *    (at your option) any later version.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with this program.  If not, see http://www.gnu.org/licenses/.
+ *
+ */
 package com.nicolacimmino.expensesreporter.app.data_sync;
 
 import android.accounts.AbstractAccountAuthenticator;
@@ -9,13 +26,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.nicolacimmino.expensesreporter.app.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensesreporter.app.ui.ExpenseDataLoginActivity;
 
-/**
- * Created by nicola on 06/05/2014.
- */
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
+
+    private static final String TAG = "ExpenseDataAuthenticator";
 
     private Context mContext;
 
@@ -29,7 +56,8 @@ public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
             AccountAuthenticatorResponse r, String s) {
         throw new UnsupportedOperationException();
     }
-    // Don't add additional accounts
+
+    // Invoked when a new account is to be added.
     @Override
     public Bundle addAccount(
             AccountAuthenticatorResponse response,
@@ -38,6 +66,9 @@ public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
             String[] strings,
             Bundle bundle) throws NetworkErrorException {
 
+        // We want to start the ExpenseDataLoginActivity and pass info about the account
+        //  to be created. We don't start the activity here
+        //  but return a bundle for the AccountManager to actually start it.
         final Intent intent = new Intent(mContext, ExpenseDataLoginActivity.class);
         intent.putExtra(ExpenseDataLoginActivity.ARG_ACCOUNT_TYPE, accountType);
         intent.putExtra(ExpenseDataLoginActivity.ARG_AUTH_TYPE, authTokenType);
@@ -121,6 +152,61 @@ public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
 
     private String signInUser(String name, String password, String authTokenType)
     {
-        return "tokenfromserverhere";
+        String authToken = "";
+
+        HttpURLConnection connection = null;
+
+        try {
+
+            Map<String,Object> params = new LinkedHashMap<String,Object>();
+            params.put("name", name);
+            params.put("password", password);
+            params.put("type", authTokenType);
+
+            // URLencode and place all params in a string like name=value&name=value...
+            StringBuilder postData = new StringBuilder();
+            for (Map.Entry<String,Object> param : params.entrySet()) {
+                if (postData.length() != 0) postData.append('&');
+                postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
+                postData.append('=');
+                postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+            }
+            byte[] postDataBytes = postData.toString().getBytes("UTF-8");
+
+            URL url = new URL("https://intra.nicolacimmino.com/report_authorize.php");
+            connection = (HttpURLConnection) url.openConnection();
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setInstanceFollowRedirects(false);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("charset", "utf-8");
+            connection.setRequestProperty("Content-Length", "" + Integer.toString(postDataBytes.length));
+            connection.setUseCaches(false);
+
+            DataOutputStream wr = new DataOutputStream(connection.getOutputStream ());
+            wr.write(postDataBytes);
+            wr.flush();
+            wr.close();
+
+            int response = connection.getResponseCode();
+            authToken = connection.getResponseMessage();
+            Log.i(TAG, String.valueOf(response));
+            connection.disconnect();
+        } catch (MalformedURLException e) {
+            Log.e(TAG, "URL is malformed", e);
+            return "";
+        } catch (IOException e) {
+            Log.e(TAG, "Error reading from network: " + e.toString());
+            return "";
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+
+        Log.i(TAG, "Got token:" + authToken);
+
+        return authToken;
     }
 }
