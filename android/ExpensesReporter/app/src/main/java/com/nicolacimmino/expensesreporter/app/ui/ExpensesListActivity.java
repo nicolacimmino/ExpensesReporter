@@ -17,7 +17,7 @@ public class ExpensesListActivity extends ListActivity  {
         super.onCreate(savedInstanceState);
 
         Cursor cursor = getContentResolver().query(ExpenseDataContract.Expense.CONTENT_URI,
-                ExpenseDataContract.Expense.COLUMN_NAME_ALL, null, null, null);
+                ExpenseDataContract.Expense.COLUMN_NAME_ALL, null, null, ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP + " DESC");
 
         ExpensesTransactionCursorAdapter adapter = new ExpensesTransactionCursorAdapter(this, R.layout.expeses_transactions_row, cursor, 0);
 

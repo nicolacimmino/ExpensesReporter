@@ -221,7 +221,7 @@ public class MainActivity extends Activity {
             if(mAccount == null) {
                 mAccount = getmAccount();
             }
-            
+
             Bundle extras = new Bundle();
             getContentResolver().requestSync(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, extras);
         }
