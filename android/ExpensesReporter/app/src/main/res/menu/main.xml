@@ -4,6 +4,7 @@
 
     <item android:id="@+id/action_submit"
         android:title="OK"
+        android:icon="@drawable/ic_action_accept"
         android:showAsAction="ifRoom" />
 
     <item android:id="@+id/action_show_expenses"

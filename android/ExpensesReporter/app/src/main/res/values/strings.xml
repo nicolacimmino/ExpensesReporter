@@ -13,7 +13,8 @@
     <string name="destination">Destination</string>
     <string name="notes">Notes</string>
     <string name="amount">Amount</string>
-
+    <string name="amount_hint">0.00</string>
+    <string name="notes_hint">Notes (Optional)</string>
     <string-array name="transaction_sources">
         <item>Bank</item>
         <item>Visa</item>
@@ -37,4 +38,8 @@
         <item>Savings</item>
         <item>Skrill</item>
     </string-array>
+
+    <string name="error_amount">Secify an amount</string>
+    <string name="saved">Saved</string>
+    <string name="error_saving">Error saving data.</string>
 </resources>

@@ -24,7 +24,9 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -36,32 +38,43 @@ import com.nicolacimmino.expensesreporter.app.R;
 import com.nicolacimmino.expensesreporter.app.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataAuthenticatorContract;
 
+import org.w3c.dom.Text;
+
+import java.util.prefs.Preferences;
+
 public class MainActivity extends Activity {
 
+    // Tag used in logs.
+    private static final String TAG = "MainActivity";
 
-    Account mAccount;
-    ContentResolver mResolver;
+    private Account mAccount;
+    private ContentResolver mResolver;
+
+    // Name of the settings where we save the last UI settings.
+    private final static String SAVED_STATE_LAST_SOURCE = "last_source";
+    private final static String SAVED_STATE_LAST_DESTINATION = "last_destination";
 
     /*
      *
      */
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         // Add values to the source spinner.
-        Spinner spinner = (Spinner) findViewById(R.id.sourceSpinner);
+        Spinner sourceSpinner = (Spinner) findViewById(R.id.sourceSpinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.transaction_sources, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        sourceSpinner.setAdapter(adapter);
 
         // Add values to the destination spinner.
-        spinner = (Spinner) findViewById(R.id.destinationSpinner);
+        Spinner destinationSpinner = (Spinner) findViewById(R.id.destinationSpinner);
         adapter = ArrayAdapter.createFromResource(this,
                 R.array.transaction_destinations, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+        destinationSpinner.setAdapter(adapter);
 
         mAccount = CreateSyncAccount(this);
         // Get the content resolver for your app
@@ -70,6 +83,37 @@ public class MainActivity extends Activity {
         // Turn on automatic syncing for the default account and authority
         ContentResolver.setIsSyncable(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, 1);
         mResolver.setSyncAutomatically(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, true);
+
+        // Recover from preferences the last used values in UI and restore them if available.
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        String lastSource = preferences.getString(SAVED_STATE_LAST_SOURCE, "");
+        String lastDestination = preferences.getString(SAVED_STATE_LAST_DESTINATION, "");
+
+        if(lastSource != "") {
+            sourceSpinner.setSelection(((ArrayAdapter)sourceSpinner.getAdapter())
+                                        .getPosition(lastSource));
+        }
+
+        if(lastDestination != "") {
+            destinationSpinner.setSelection(((ArrayAdapter) destinationSpinner.getAdapter())
+                    .getPosition(lastDestination));
+        }
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // Store some values that we want to persist across instance of the activity.
+        Spinner sourceSpinner = (Spinner) findViewById(R.id.sourceSpinner);
+        Spinner destinationSpinner = (Spinner) findViewById(R.id.destinationSpinner);
+
+        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(SAVED_STATE_LAST_SOURCE, sourceSpinner.getSelectedItem().toString());
+        editor.putString(SAVED_STATE_LAST_DESTINATION, destinationSpinner.getSelectedItem().toString());
+        editor.commit();
     }
 
     public static Account CreateSyncAccount(Context context) {
@@ -140,6 +184,7 @@ public class MainActivity extends Activity {
      */
     public void onTransactionConfirmClick()
     {
+
         try {
 
             // Get the input controls.
@@ -149,6 +194,16 @@ public class MainActivity extends Activity {
             TextView notesView = (TextView) findViewById(R.id.textDescription);
             TextView currencyView = (TextView) findViewById(R.id.textAmountCurrency);
 
+            // We cannot accept an empty amount. Give error and don't save.
+            // Also set focus on the amount input control so it's faster for the user
+            //  to rectify the problem.
+            if(amountView.getText().toString().isEmpty()) {
+                amountView.setError(getString(R.string.error_amount));
+                amountView.requestFocus();
+                return;
+            }
+
+            // Prepare values and invoke insert on the Expense Data Content Provider
             ContentValues values = new ContentValues();
             values.put(ExpenseDataContract.Expense.COLUMN_NAME_AMOUNT, amountView.getText().toString());
             values.put(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE, sourceSpinner.getSelectedItem().toString());
@@ -161,15 +216,16 @@ public class MainActivity extends Activity {
             // Clear the input fields so the interface is ready for another operation.
             amountView.setText("");
             notesView.setText("");
+            amountView.requestFocus();
 
             // We show a toaster as visual feedback that something has happened.
-            Toast.makeText(getApplicationContext(), "Saved.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.saved), Toast.LENGTH_SHORT).show();
 
             getContentResolver().requestSync(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, null);
         }
         catch(Exception e)
         {
-            Toast.makeText(getApplicationContext(), "Invalid input.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.error_saving), Toast.LENGTH_SHORT).show();
         }
     }
 
