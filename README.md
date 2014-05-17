@@ -12,9 +12,10 @@ User can also get a list of expenses, this is a very simple list for now with no
 
 ![Screenshot](https://raw.github.com/nicolacimmino/ExpensesReporter/master/documentation/screenshot2.png)
 
-The application keeps data in sync with the server by means of a sync adapter. The sync service creates a new Android account type in order to authenticate the user with the server. The account can be found under Settings as other accounts are usually found in Android:
+The application keeps data in sync with the server by means of a sync adapter. The sync service creates a new Android account type in order to authenticate the user with the server. The account can be found under Settings as other accounts are usually found in Android.
+Additionally at the first start the application asks the user to authenticate with the server and creates automatically a sync account.
 
-![Screenshot](https://raw.github.com/nicolacimmino/ExpensesReporter/master/documentation/screenshot3.png)
+![Screenshot](https://raw.github.com/nicolacimmino/ExpensesReporter/master/documentation/screenshot0.png)
 
 Software Architecture
 ===========
