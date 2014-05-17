@@ -9,8 +9,8 @@
     <string name="default_currency">eur</string>
     <string name="title_activity_expenses_list">Expenses</string>
     <string name="action_show_expenses">Show Expenses</string>
-    <string name="source">Source</string>
-    <string name="destination">Destination</string>
+    <string name="source">Payment Method</string>
+    <string name="destination">Category</string>
     <string name="notes">Notes</string>
     <string name="amount">Amount</string>
     <string name="amount_hint">0.00</string>
