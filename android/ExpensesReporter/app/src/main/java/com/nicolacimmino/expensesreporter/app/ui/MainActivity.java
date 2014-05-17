@@ -78,24 +78,6 @@ public class MainActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         destinationSpinner.setAdapter(adapter);
 
-        AccountManager accountManager = AccountManager.get(this);
-        Account[] accounts =  accountManager.getAccounts();
-        if(accounts.length == 0) {
-            // There is no account, we need to ask user to set one up.
-            Toast.makeText(getApplicationContext(), "Create account!", Toast.LENGTH_SHORT).show();
-            accountManager.addAccount(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE,
-                    ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS,
-                    null, null, this, null, null);
-            return;
-        }
-        else {
-            mAccount = accounts[0];
-        }
-
-        // Turn on automatic syncing for the default account and authority
-        ContentResolver.setIsSyncable(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, 1);
-        mResolver.setSyncAutomatically(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, true);
-
         // Recover from preferences the last used values in UI and restore them if available.
         SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         String lastSource = preferences.getString(SAVED_STATE_LAST_SOURCE, "");
@@ -111,6 +93,35 @@ public class MainActivity extends Activity {
                     .getPosition(lastDestination));
         }
 
+        mAccount = getmAccount();
+    }
+
+    private Account getmAccount()
+    {
+        Account theAccount;
+
+        AccountManager accountManager = AccountManager.get(this);
+        Account[] accounts =  accountManager.getAccountsByType(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
+
+        Log.i(TAG, "Accounts:" + accounts.length);
+
+        if(accounts.length == 0) {
+            // There is no account, we need to ask user to set one up.
+            Toast.makeText(getApplicationContext(), "Create account!", Toast.LENGTH_SHORT).show();
+            accountManager.addAccount(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE,
+                    ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS,
+                    null, null, this, null, null);
+            return null;
+        }
+        else {
+            theAccount = accounts[0];
+        }
+
+        // Turn on automatic syncing for the default account and authority
+        ContentResolver.setIsSyncable(theAccount, ExpenseDataContract.CONTENT_AUTHORITY, 1);
+        mResolver.setSyncAutomatically(theAccount, ExpenseDataContract.CONTENT_AUTHORITY, true);
+
+        return theAccount;
     }
 
     @Override
@@ -207,11 +218,16 @@ public class MainActivity extends Activity {
             // We show a toast as visual feedback that something has happened.
             Toast.makeText(getApplicationContext(), getString(R.string.saved), Toast.LENGTH_SHORT).show();
 
-            getContentResolver().requestSync(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, null);
+            if(mAccount == null) {
+                mAccount = getmAccount();
+            }
+            
+            Bundle extras = new Bundle();
+            getContentResolver().requestSync(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, extras);
         }
         catch(Exception e)
         {
-            Toast.makeText(getApplicationContext(), getString(R.string.error_saving), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
     }
 
