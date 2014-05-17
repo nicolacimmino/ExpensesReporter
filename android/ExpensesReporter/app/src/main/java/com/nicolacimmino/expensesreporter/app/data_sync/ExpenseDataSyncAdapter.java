@@ -56,16 +56,9 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public ExpenseDataSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
-    }
-
-    public ExpenseDataSyncAdapter(
-            Context context,
-            boolean autoInitialize,
-            boolean allowParallelSyncs) {
-        super(context, autoInitialize, allowParallelSyncs);
-
         mAccountManager = AccountManager.get(context);
     }
+
 
     public void onPerformSync(
             Account account,
@@ -74,11 +67,14 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
             ContentProviderClient provider,
             SyncResult syncResult) {
 
+        Log.i(TAG, "Sync for: " + account.name);
         String authToken="";
         try {
             authToken = mAccountManager.blockingGetAuthToken(account, ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, true);
         }
         catch(Exception e) {
+            //syncResult.stats.numAuthExceptions++;
+            Log.i("","Exception on get auth token");
             syncResult.stats.numAuthExceptions++;
             return;
         }
@@ -104,6 +100,7 @@ public class ExpenseDataSyncAdapter extends AbstractThreadedSyncAdapter {
                 params.put("destination", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_DESTINATION)));
                 params.put("source", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_SOURCE)));
                 params.put("timestamp", expenses.getString(expenses.getColumnIndex(ExpenseDataContract.Expense.COLUMN_NAME_TIMESTAMP)));
+                params.put("token", authToken);
 
                 // URLencode and place all params in a string like name=value&name=value...
                 StringBuilder postData = new StringBuilder();

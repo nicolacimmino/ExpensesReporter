@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.nicolacimmino.expensesreporter.app.R;
 import com.nicolacimmino.expensesreporter.app.data_model.ExpenseDataContract;
+import com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataAuthenticator;
 import com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataAuthenticatorContract;
 
 import org.w3c.dom.Text;
@@ -47,8 +48,9 @@ public class MainActivity extends Activity {
     // Tag used in logs.
     private static final String TAG = "MainActivity";
 
-    private Account mAccount;
     private ContentResolver mResolver;
+
+    private Account mAccount;
 
     // Name of the settings where we save the last UI settings.
     private final static String SAVED_STATE_LAST_SOURCE = "last_source";
@@ -76,9 +78,19 @@ public class MainActivity extends Activity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         destinationSpinner.setAdapter(adapter);
 
-        mAccount = CreateSyncAccount(this);
-        // Get the content resolver for your app
-        mResolver = getContentResolver();
+        AccountManager accountManager = AccountManager.get(this);
+        Account[] accounts =  accountManager.getAccounts();
+        if(accounts.length == 0) {
+            // There is no account, we need to ask user to set one up.
+            Toast.makeText(getApplicationContext(), "Create account!", Toast.LENGTH_SHORT).show();
+            accountManager.addAccount(ExpenseDataAuthenticatorContract.ACCOUNT_TYPE,
+                    ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS,
+                    null, null, this, null, null);
+            return;
+        }
+        else {
+            mAccount = accounts[0];
+        }
 
         // Turn on automatic syncing for the default account and authority
         ContentResolver.setIsSyncable(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, 1);
@@ -114,32 +126,6 @@ public class MainActivity extends Activity {
         editor.putString(SAVED_STATE_LAST_SOURCE, sourceSpinner.getSelectedItem().toString());
         editor.putString(SAVED_STATE_LAST_DESTINATION, destinationSpinner.getSelectedItem().toString());
         editor.commit();
-    }
-
-    public static Account CreateSyncAccount(Context context) {
-
-        Account newAccount = new Account(ExpenseDataAuthenticatorContract.ACCOUNT,
-                                            ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
-        AccountManager accountManager = (AccountManager) context.getSystemService(ACCOUNT_SERVICE);
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call context.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-        } else {
-            /*
-             * The account exists or some other error occurred. Log this, report it,
-             * or handle it internally.
-             */
-        }
-
-        return newAccount;
     }
 
     /*
@@ -218,7 +204,7 @@ public class MainActivity extends Activity {
             notesView.setText("");
             amountView.requestFocus();
 
-            // We show a toaster as visual feedback that something has happened.
+            // We show a toast as visual feedback that something has happened.
             Toast.makeText(getApplicationContext(), getString(R.string.saved), Toast.LENGTH_SHORT).show();
 
             getContentResolver().requestSync(mAccount, ExpenseDataContract.CONTENT_AUTHORITY, null);

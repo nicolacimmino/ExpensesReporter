@@ -38,23 +38,40 @@
 	$amount =(isset($_REQUEST['amount']))?$_REQUEST['amount']:exit;
 	$destination =(isset($_REQUEST['destination']))?$_REQUEST['destination']:exit;
 	$source =(isset($_REQUEST['source']))?$_REQUEST['source']:exit;
-	$timestamp =(isset($_REQUEST['timestamp']))?$_REQUEST['timestamp']:exit;
+	$timestamp =(isset($_REQUEST['timestamp']))?$_REQUEST['timestamp']:"";
+	$token =(isset($_REQUEST['token']))?$_REQUEST['token']:exit;
+	
 				
 	// Get a database connection
 	require_once("pdo_intra.php");
 	
-	// Insert the expense in database. Note that we don't need to escape strings
-	//	here since PDO bindParam is already taking care to protect from SQL injections.
-	$query = $intrapdo->prepare("INSERT INTO ex_expenses SET description=:description,
-			  											   amount=:amount,
-														   transactionto=:destination,
-														   transactionfrom=:source,
-														   raw_id=:request_id");
+	// Check that this token corrsponds to an authorized user.
+	if($token!="")
+	{
+		// Find an user with this token.
+		$query = $intrapdo->prepare("SELECT * FROM users WHERE token=:token");
+		
+		$query->bindParam(':token', $token, PDO::PARAM_STR, 256);
+		$query->Execute();
+		$row = $query->fetch();
 	
-	$query->bindParam(':description', $description, PDO::PARAM_STR, 256);
-	$query->bindParam(':amount', $amount, PDO::PARAM_STR, 256);
-	$query->bindParam(':destination', $destination, PDO::PARAM_STR, 256);
-	$query->bindParam(':source', $source, PDO::PARAM_STR, 256);
-	$query->bindParam(':request_id', $request_id, PDO::PARAM_INT);
-	$query->Execute();
+		// If we have at least one row and that row is for a user with API access we proceed.
+		if($row !== false && $row['accesslevel']=="api")
+		{		
+			// Insert the expense in database. Note that we don't need to escape strings
+			//	here since PDO bindParam is already taking care to protect from SQL injections.
+			$query = $intrapdo->prepare("INSERT INTO ex_expenses SET description=:description,
+																   amount=:amount,
+																   transactionto=:destination,
+																   transactionfrom=:source,
+																   raw_id=:request_id");
+			
+			$query->bindParam(':description', $description, PDO::PARAM_STR, 256);
+			$query->bindParam(':amount', $amount, PDO::PARAM_STR, 256);
+			$query->bindParam(':destination', $destination, PDO::PARAM_STR, 256);
+			$query->bindParam(':source', $source, PDO::PARAM_STR, 256);
+			$query->bindParam(':request_id', $request_id, PDO::PARAM_INT);
+			$query->Execute();
+		}
+	}
 ?>
