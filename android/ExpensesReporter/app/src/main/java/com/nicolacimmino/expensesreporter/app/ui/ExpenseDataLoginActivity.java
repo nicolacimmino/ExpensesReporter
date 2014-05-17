@@ -18,12 +18,15 @@
 */
 package com.nicolacimmino.expensesreporter.app.ui;
 
+import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
+import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
@@ -46,6 +49,8 @@ import com.google.android.gms.common.SignInButton;
 import java.util.ArrayList;
 import java.util.List;
 import com.nicolacimmino.expensesreporter.app.R;
+import com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataAuthenticator;
+import com.nicolacimmino.expensesreporter.app.data_sync.ExpenseDataAuthenticatorContract;
 
 
 public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity implements LoaderCallbacks<Cursor>{
@@ -286,25 +291,21 @@ public class ExpenseDataLoginActivity extends AccountAuthenticatorActivity imple
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
+            String authToken = ExpenseDataAuthenticator.SignInUser(mEmail, mPassword, "");
+            if(authToken==null || authToken.isEmpty()) {
                 return false;
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
+            Account newAccount = new Account(mEmail, ExpenseDataAuthenticatorContract.ACCOUNT_TYPE);
+            AccountManager accountManager = (AccountManager) getApplicationContext().getSystemService(ACCOUNT_SERVICE);
 
-            // TODO: register the new account here.
-            return true;
+            if(accountManager.addAccountExplicitly(newAccount, mPassword, null)) {
+                accountManager.setAuthToken(newAccount, ExpenseDataAuthenticatorContract.AUTHTOKEN_TYPE_FULL_ACCESS, authToken);
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         @Override

@@ -31,8 +31,11 @@ import android.util.Log;
 import com.nicolacimmino.expensesreporter.app.data_model.ExpenseDataContract;
 import com.nicolacimmino.expensesreporter.app.ui.ExpenseDataLoginActivity;
 
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -105,7 +108,7 @@ public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
         if (TextUtils.isEmpty(authToken)) {
             final String password = am.getPassword(account);
             if (password != null) {
-                authToken = signInUser(account.name, password, authTokenType);
+                authToken = ExpenseDataAuthenticator.SignInUser(account.name, password, authTokenType);
             }
         }
 
@@ -150,8 +153,10 @@ public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
         throw new UnsupportedOperationException();
     }
 
-    private String signInUser(String name, String password, String authTokenType)
+    public static String SignInUser(String name, String password, String authTokenType)
     {
+        Log.i(TAG, "signInUser invoked");
+
         String authToken = "";
 
         HttpURLConnection connection = null;
@@ -190,7 +195,10 @@ public class ExpenseDataAuthenticator extends AbstractAccountAuthenticator {
             wr.close();
 
             int response = connection.getResponseCode();
-            authToken = connection.getResponseMessage();
+
+            InputStreamReader in = new InputStreamReader((InputStream) connection.getContent());
+            BufferedReader buff = new BufferedReader(in);
+            authToken = buff.readLine();
             Log.i(TAG, String.valueOf(response));
             connection.disconnect();
         } catch (MalformedURLException e) {
