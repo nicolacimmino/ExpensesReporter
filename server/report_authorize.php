@@ -54,7 +54,7 @@
 		// expected hashed password. The hash contains also the hashing algorithm and the random salt that was 
 		// used to hash the password. The function just hashes the supplied password using the salt and algorithm 
 		// supplied. If this matches that hash in DB the password is the right one.
-		if(crypt($password , $row['passwordHash']) == $row['passwordHash'])
+		if(time_constant_equal(crypt($password , $row['passwordHash']), $row['passwordHash']))
 		{
 			// We generate a random token. The token is 32 bytes long and, once hex encoded will be 64 chars.
 			$token = bin2hex(openssl_random_pseudo_bytes(32));
@@ -70,5 +70,41 @@
 			// This is the only reply given by this page.
 			echo($token); 
 		}
+	}
+	
+
+	// Performs comparison of two strings in a time that depends only
+	//	on the length of the first string and not on the content. Normal string
+	//	comparison is optimized to stop comparing as soon as a difference is found.
+	//	So for instance comparing "abcd1" to "abcd2" will take different time than
+	//	comparing "abcd1" to "zbcd2". This is not safe in authentication as a remote
+	//	attacker could, by timing the requests, gain insight of single correct 
+	//	chars in the supplied data.
+	// This function doesn't compare every single char but xors it to the expected one
+	//	which yields a zero if the two are identical. The binary operation takes a 
+	//	constant time regardless of the numbers involved and since every char is 
+	//	processed regardless of result the execution time doesn't vary. Note that
+	//  some implementations make use of a char comparison in place of the xor. Char
+	//	comparison is often compiled anyway to a branched statement that takes different
+	//	time to execute depending on the result, so that type of implementation gives
+	//	away at least the amount of matching chars.
+	function time_constant_equal($a, $b)
+	{
+		// Must be at least same length.
+		$result = strlen($a) ^ strlen($b);
+		
+		// Go trough each char of $a and XOR it with the corresponding
+		// char in $b, the result is zero only if they are equal.
+		// We OR the comparison result with the final result since OR
+		//	final result is zero only if both operands are zero.
+		// In other words if only one of the XORs returns 1 the overall
+		//	result is 1.
+		for($i = 0; $i < strlen($a) && $i < strlen($b); $i++)
+		{
+			$result |= ord($a[$i]) ^ ord($b[$i]);
+		}
+		
+		// Result is true (string equal) only if we got zeros at every step before.
+		return $result === 0;
 	}
 ?>
