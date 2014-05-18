@@ -40,7 +40,6 @@ import java.net.URLEncoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-
 /*
  * Sync adapter for Expense data.
  * This is used by Android sync manager to execute data syncs.

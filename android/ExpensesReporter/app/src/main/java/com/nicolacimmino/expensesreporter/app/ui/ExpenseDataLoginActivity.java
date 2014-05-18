@@ -16,6 +16,7 @@
  *    along with this program.  If not, see http://www.gnu.org/licenses/.
  *
 */
+
 package com.nicolacimmino.expensesreporter.app.ui;
 
 import android.accounts.Account;
