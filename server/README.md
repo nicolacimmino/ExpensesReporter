@@ -4,7 +4,7 @@ The Sync Server
 
 For the purpose of backing this application I have defined a very simple sync API. I am not claiming by no means that this is a safe implementation, it has just been put up to support the application development.
 
-If you had to develop an API to actually use in production I think I would have gone for a REsTful API and OAuth to sign the requests. That being said this example API is reasonably safe only if HTTPS is used as transport.
+If I had to develop an API to actually use in production I think I would have gone for a REsTful API and OAuth to sign the requests. That being said this example API is reasonably safe only if HTTPS is used as transport.
 
 In any case it is not safer than just sending login and passwords at every request, over HTTPS. The token is there just to experiment better with the Android Authentication manager ability to store authentication tokens.
 
